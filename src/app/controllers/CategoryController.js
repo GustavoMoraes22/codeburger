@@ -52,9 +52,13 @@ class CategoryController {
 
   // metodo para ver todas as categorias
   async index(request, response) {
-    const category = await Category.findAll();
+    try {
+      const category = await Category.findAll();
 
-    return response.json(category);
+      return response.json(category);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async update(request, response) {

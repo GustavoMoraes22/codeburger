@@ -5,47 +5,55 @@ import User from "../models/User";
 
 class ProductController {
   async store(request, response) {
-    const schema = Yup.object().shape({
-      name: Yup.string().required(),
-      price: Yup.number().required(),
-      category_id: Yup.number().required(),
-      offer: Yup.boolean(),
-    });
-
     try {
-      await schema.validateSync(request.body, { abortEarly: false });
+      const schema = Yup.object().shape({
+        name: Yup.string().required(),
+        price: Yup.number().required(),
+        category_id: Yup.number().required(),
+        offer: Yup.boolean(),
+      });
+
+      try {
+        await schema.validateSync(request.body, { abortEarly: false });
+      } catch (error) {
+        return response.status(400).json({ error: error.errors });
+      }
+
+      const { admin: isAdmin } = await User.findByPk(request.userId);
+
+      if (!isAdmin) {
+        return response.status(401).json();
+      }
+
+      const { filename: path } = request.file;
+      const { name, price, category_id, offer } = request.body;
+
+      const product = await Product.create({
+        name,
+        price,
+        category_id,
+        path,
+        offer,
+      });
+
+      return response.json({ product });
     } catch (error) {
-      return response.status(400).json({ error: error.errors });
+      console.log(error);
     }
-
-    const { admin: isAdmin } = await User.findByPk(request.userId);
-
-    if (!isAdmin) {
-      return response.status(401).json();
-    }
-
-    const { filename: path } = request.file;
-    const { name, price, category_id, offer } = request.body;
-
-    const product = await Product.create({
-      name,
-      price,
-      category_id,
-      path,
-      offer,
-    });
-
-    return response.json({ product });
   }
 
   async index(request, response) {
-    const products = await Product.findAll({
-      include: [
-        { model: Category, as: "category", attributes: ["id", "name"] },
-      ],
-    });
-    console.log(request.userId);
-    return response.json(products);
+    try {
+      const products = await Product.findAll({
+        include: [
+          { model: Category, as: "category", attributes: ["id", "name"] },
+        ],
+      });
+      console.log(request.userId);
+      return response.json(products);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async update(request, response) {
