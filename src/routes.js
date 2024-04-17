@@ -20,6 +20,7 @@ routes.post("/sessions", SessionController.store);
 
 // todas as rotas que estiverem abaixo desse comando vai passar pelo Middlewares
 routes.use(authMiddlewares);
+// verifa se o token expirou
 
 routes.post("/products", upload.single("file"), ProductController.store); // ira fazer o upload da img do produto
 routes.get("/products", ProductController.index);

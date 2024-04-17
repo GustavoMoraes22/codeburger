@@ -57,60 +57,56 @@ class ProductController {
   }
 
   async update(request, response) {
+    const schema = Yup.object().shape({
+      name: Yup.string(),
+      price: Yup.number(),
+      category_id: Yup.number(),
+      offer: Yup.boolean(),
+    });
+
     try {
-      const schema = Yup.object().shape({
-        name: Yup.string(),
-        price: Yup.number(),
-        category_id: Yup.number(),
-        offer: Yup.boolean(),
-      });
-
-      try {
-        await schema.validateSync(request.body, { abortEarly: false });
-      } catch (error) {
-        return response.status(400).json({ error: error.errors });
-      }
-
-      const { admin: isAdmin } = await User.findByPk(request.userId);
-
-      if (!isAdmin) {
-        return response.status(401).json();
-      }
-
-      const { id } = request.params;
-
-      const product = await Product.findByPk(id);
-
-      if (!product) {
-        return response
-          .status(401)
-          .json({ error: "Make sure your product ID is correct" });
-      }
-
-      let path;
-      if (request.file) {
-        path = request.file.filename;
-      }
-
-      const { name, price, category_id, offer } = request.body;
-
-      await Product.update(
-        {
-          name,
-          price,
-          category_id,
-          path,
-          offer,
-        },
-        {
-          where: { id },
-        },
-      );
-
-      return response.status(200).json();
+      await schema.validateSync(request.body, { abortEarly: false });
     } catch (error) {
-      console.log(error);
+      return response.status(400).json({ error: error.errors });
     }
+
+    const { admin: isAdmin } = await User.findByPk(request.userId);
+
+    if (!isAdmin) {
+      return response.status(401).json();
+    }
+
+    const { id } = request.params;
+
+    const product = await Product.findByPk(id);
+
+    if (!product) {
+      return response
+        .status(401)
+        .json({ error: "Make sure your product ID is correct" });
+    }
+
+    let path;
+    if (request.file) {
+      path = request.file.filename;
+    }
+
+    const { name, price, category_id, offer } = request.body;
+
+    await Product.update(
+      {
+        name,
+        price,
+        category_id,
+        path,
+        offer,
+      },
+      {
+        where: { id },
+      },
+    );
+
+    return response.status(200).json();
   }
 }
 
