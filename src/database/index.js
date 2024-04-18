@@ -1,6 +1,6 @@
 import { Sequelize } from "sequelize";
 import User from "../app/models/User";
-import configDatabase from "../config/database";
+// import configDatabase from "../config/database";
 import Product from "../app/models/Product";
 import Category from "../app/models/Category";
 import mongoose from "mongoose";
@@ -14,7 +14,9 @@ class Database {
   }
 
   init() {
-    this.connection = new Sequelize(configDatabase);
+    this.connection = new Sequelize(
+      "postgresql://postgres:HFaYfZurPkrKBlTqxZeNKbJOPDoJMzyk@roundhouse.proxy.rlwy.net:11550/railway",
+    );
     models
       .map((model) => model.init(this.connection))
       .map(
@@ -24,7 +26,7 @@ class Database {
 
   mongo() {
     this.mongoConnection = mongoose.connect(
-      "mongodb://localhost:27017/codeburger",
+      "mongodb://mongo:sjNhpwWJvnkKawTbmsZwASfrspJUCYcL@viaduct.proxy.rlwy.net:29860",
     );
   }
 }
