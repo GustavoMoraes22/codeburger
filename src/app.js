@@ -5,10 +5,15 @@ import cors from "cors";
 
 import "./database";
 
+const corsOptions = {
+  origin: "https://code-burger-react-ochre.vercel.app",
+  credentials: true,
+};
+
 class App {
   constructor() {
     this.app = express();
-    this.app.use(cors());
+    this.app.use(cors(corsOptions));
 
     this.middlewares();
     this.routes();
